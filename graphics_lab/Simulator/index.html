@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CG Algorithm Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <h1>Computer Graphics Algorithm Simulator</h1>
+
+    <div class="topbar">
+      <div class="controls">
+        <label class="lbl">Category</label>
+        <select id="category">
+          <option value="basic">Basic Rasterization</option>
+          <option value="transform">Basic 2D Transformations</option>
+          <option value="clip">Clipping Algorithms</option>
+          <option value="fill">Polygon Filling</option>
+          <option value="hidden">Hidden Surface Detection</option>
+        </select>
+
+        <label class="lbl">Algorithm</label>
+        <select id="algorithm"></select>
+      </div>
+
+      <div class="controls">
+        <label class="lbl">Speed</label>
+        <input id="speed" type="range" min="1" max="60" value="30" />
+        <span id="speedLabel">30 fps</span>
+
+        <label class="lbl">Grid</label>
+        <select id="gridMode">
+          <option value="on" selected>On</option>
+          <option value="off">Off</option>
+        </select>
+
+        <button id="btnRun">Run</button>
+        <button id="btnStep">Step</button>
+        <button class="clear" id="btnClear">Clear</button>
+      </div>
+    </div>
+
+    <!-- BASIC INPUTS -->
+    <div class="panel" id="panelBasic">
+      <div class="row">
+        <input type="number" id="x1" placeholder="x1 / xc" />
+        <input type="number" id="y1" placeholder="y1 / yc" />
+        <input type="number" id="x2" placeholder="x2 / Radius" />
+        <input type="number" id="y2" placeholder="y2 (Line only)" />
+      </div>
+      <p class="hint small">
+        Basic mode uses Cartesian coordinates: origin is canvas center.
+      </p>
+    </div>
+
+    <!-- 2D TRANSFORMATION INPUTS -->
+    <div class="panel" id="panelTransform">
+      <div class="row wrap">
+        <div class="block">
+          <div class="title">2D Object</div>
+          <div class="smalltext">
+            Click on the canvas to add object vertices in order. Use "Close Object" when the polygon is complete.
+          </div>
+          <div class="row wrap">
+            <button id="btnCloseTransform">Close Object</button>
+            <button id="btnUndoTransform">Undo Vertex</button>
+            <button id="btnResetTransform" class="clear">Reset Object</button>
+          </div>
+          <div class="smalltext mono" id="transformInfo">Vertices: 0 | Closed: No</div>
+        </div>
+
+        <div class="block wide">
+          <div class="title">Transformation Parameters</div>
+          <div class="paramGrid">
+            <label class="lbl2" for="tx">Translate X</label>
+            <input type="number" id="tx" value="40" />
+            <label class="lbl2" for="ty">Translate Y</label>
+            <input type="number" id="ty" value="30" />
+
+            <label class="lbl2" for="sx">Scale X</label>
+            <input type="number" id="sx" value="1.5" step="0.1" />
+            <label class="lbl2" for="sy">Scale Y</label>
+            <input type="number" id="sy" value="1.5" step="0.1" />
+
+            <label class="lbl2" for="angle2d">Angle</label>
+            <input type="number" id="angle2d" value="30" />
+            <label class="lbl2" for="reflectionMode">Reflection</label>
+            <select id="reflectionMode">
+              <option value="x-axis">Across X-axis</option>
+              <option value="y-axis">Across Y-axis</option>
+              <option value="origin">Across Origin</option>
+              <option value="y=x">Across y = x</option>
+              <option value="y=-x">Across y = -x</option>
+            </select>
+
+            <label class="lbl2" for="shx">Shear X</label>
+            <input type="number" id="shx" value="0.5" step="0.1" />
+            <label class="lbl2" for="shy">Shear Y</label>
+            <input type="number" id="shy" value="0" step="0.1" />
+
+            <label class="lbl2" for="pivotX">Pivot X</label>
+            <input type="number" id="pivotX" value="0" />
+            <label class="lbl2" for="pivotY">Pivot Y</label>
+            <input type="number" id="pivotY" value="0" />
+          </div>
+          <div class="smalltext">
+            Scaling, rotation, and shearing use the pivot values. Reflection is applied about the selected axis or line.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIPPING INPUTS -->
+    <div class="panel" id="panelClip">
+      <div class="row wrap">
+        <div class="block">
+          <div class="title">Clipping Window</div>
+          <div class="smalltext">
+            The rectangle is defined using Cartesian coordinates and is drawn on the canvas before clipping.
+          </div>
+          <div class="paramGrid">
+            <label class="lbl2" for="clipXMin">xMin</label>
+            <input type="number" id="clipXMin" value="-120" />
+            <label class="lbl2" for="clipYMin">yMin</label>
+            <input type="number" id="clipYMin" value="-90" />
+
+            <label class="lbl2" for="clipXMax">xMax</label>
+            <input type="number" id="clipXMax" value="120" />
+            <label class="lbl2" for="clipYMax">yMax</label>
+            <input type="number" id="clipYMax" value="90" />
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="title">Line Input</div>
+          <div class="smalltext">
+            Use these values when running Cohen-Sutherland line clipping.
+          </div>
+          <div class="paramGrid">
+            <label class="lbl2" for="clipLineX1">x1</label>
+            <input type="number" id="clipLineX1" value="-180" />
+            <label class="lbl2" for="clipLineY1">y1</label>
+            <input type="number" id="clipLineY1" value="-40" />
+
+            <label class="lbl2" for="clipLineX2">x2</label>
+            <input type="number" id="clipLineX2" value="180" />
+            <label class="lbl2" for="clipLineY2">y2</label>
+            <input type="number" id="clipLineY2" value="130" />
+          </div>
+        </div>
+
+        <div class="block wide">
+          <div class="title">Polygon Input</div>
+          <div class="smalltext">
+            Select Sutherland-Hodgman polygon clipping, then click on the canvas to add polygon vertices in order.
+          </div>
+          <div class="row wrap">
+            <button id="btnCloseClipPoly">Close Polygon</button>
+            <button id="btnUndoClipVertex">Undo Vertex</button>
+            <button id="btnResetClipPoly" class="clear">Reset Polygon</button>
+          </div>
+          <div class="smalltext mono" id="clipPolyInfo">Vertices: 0 | Closed: No</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILL INPUTS -->
+    <div class="panel" id="panelFill">
+      <div class="row wrap">
+        <div class="block">
+          <div class="title">Polygon</div>
+          <div class="smalltext">
+            Click on canvas to add vertices (in order). Use “Close Polygon” to lock.
+          </div>
+          <div class="row">
+            <button id="btnClosePoly">Close Polygon</button>
+            <button id="btnUndoVertex">Undo Vertex</button>
+            <button id="btnResetPoly" class="clear">Reset Polygon</button>
+          </div>
+          <div class="smalltext mono" id="polyInfo">Vertices: 0 | Closed: No</div>
+        </div>
+
+        <div class="block">
+          <div class="title">Fill Parameters</div>
+          <div class="row">
+            <label class="lbl2">Fill</label>
+            <input id="fillColor" type="color" value="#000000" />
+            <label class="lbl2">Boundary</label>
+            <input id="boundaryColor" type="color" value="#ff0000" />
+          </div>
+          <div class="smalltext">
+            For Boundary/Flood fill: click a seed point inside the region.
+          </div>
+          <div class="smalltext mono" id="seedInfo">Seed: (not set)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HIDDEN SURFACE INPUTS -->
+    <div class="panel" id="panelHidden">
+      <div class="row wrap">
+        <div class="block">
+          <div class="title">Object</div>
+          <div class="row">
+            <select id="object3d">
+              <option value="cube" selected>Cube</option>
+              <option value="pyramid">Pyramid</option>
+            </select>
+            <label class="lbl2">Scale</label>
+            <input id="scale3d" type="number" value="120" min="40" max="220" />
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="title">Rotation (degrees)</div>
+          <div class="row wrap">
+            <div class="sliderRow">
+              <label class="lbl2">X</label>
+              <input id="rotX" type="range" min="-180" max="180" value="25" />
+              <span class="mono" id="rotXv">25</span>
+            </div>
+            <div class="sliderRow">
+              <label class="lbl2">Y</label>
+              <input id="rotY" type="range" min="-180" max="180" value="35" />
+              <span class="mono" id="rotYv">35</span>
+            </div>
+            <div class="sliderRow">
+              <label class="lbl2">Z</label>
+              <input id="rotZ" type="range" min="-180" max="180" value="0" />
+              <span class="mono" id="rotZv">0</span>
+            </div>
+          </div>
+          <div class="smalltext">
+            View direction is along -Z (camera looking into screen).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <canvas id="canvas" width="700" height="560"></canvas>
+
+    <div class="status">
+      <div class="mono" id="statusText">Ready.</div>
+      <div class="mono" id="stepText">Step: 0</div>
+    </div>
+
+    <p class="hint">
+      Origin (0,0) is at center | +X → Right | +Y → Up | Click canvas for polygon vertices in fill, transformation, and polygon clipping modes
+    </p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
