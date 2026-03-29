@@ -12,6 +12,57 @@ This project is a front-end-only graphics simulator built with:
 
 It runs in the browser and lets the user experiment with common computer graphics algorithms using direct inputs and canvas interaction.
 
+## Screenshots
+
+Add your screenshots to a folder such as `screenshots/` and update the paths below.
+
+### Main Interface
+
+![Main Interface](screenshots/main-interface.png)
+
+### 2D Transformations
+
+![2D Transformations](screenshots/transformations.png)
+
+### Clipping Algorithms
+
+![Clipping Algorithms](screenshots/clipping1.png)
+![Clipping Algorithms](screenshots/clipping2.png)
+
+### Polygon Filling
+
+![Polygon Filling](screenshots/filling.png)
+
+### Hidden Surface Detection
+
+![Hidden Surface Detection](screenshots/hidden-surface1.png)
+![Hidden Surface Detection](screenshots/hidden-surface2.png)
+
+## Features Checklist
+
+- [x] Cartesian coordinate system with center origin
+- [x] Optional grid and axis display
+- [x] DDA line drawing
+- [x] Bresenham line drawing
+- [x] Midpoint circle drawing
+- [x] 2D translation
+- [x] 2D scaling
+- [x] 2D rotation
+- [x] 2D shearing
+- [x] 2D reflection
+- [x] Cohen-Sutherland line clipping
+- [x] Sutherland-Hodgman polygon clipping
+- [x] Scan-line polygon fill
+- [x] Boundary fill
+- [x] Flood fill
+- [x] Back-face culling
+- [x] Painter's algorithm
+- [x] Z-buffer rendering
+- [x] Interactive canvas-based input for polygon/object creation
+- [x] Step-by-step fill visualization
+- [x] Adjustable animation speed
+- [x] Responsive neumorphism-inspired UI
+
 ## Algorithms Simulated
 
 ### Basic Rasterization
