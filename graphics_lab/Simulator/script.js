@@ -717,15 +717,22 @@ function buildScanlineQueue(vertices, fillHex) {
    Uses imageData buffer, fills in batches
 ========================= */
 function buildBoundaryFillQueue(seed, boundaryHex, fillHex) {
-  const boundaryRGBA = hexToRGBA(boundaryHex);
+  // Support multiple boundary colors (comma-separated hex values)
+  const boundaryHexes = boundaryHex.split(',').map(h => h.trim());
+  const boundaryRGBAs = boundaryHexes.map(h => hexToRGBA(h));
   const fillRGBA = hexToRGBA(fillHex);
 
   const img = ctx.getImageData(0, 0, WIDTH, HEIGHT);
 
+  // Helper: check if pixel matches any boundary color
+  function isBoundary(px) {
+    return boundaryRGBAs.some(br => sameRGBA(px, br));
+  }
+
   // If seed is on boundary or already fill, nothing to do
   const seedPx = getPixelRGBA(img, seed.x, seed.y);
   if (!seedPx) return { img, q: [] };
-  if (sameRGBA(seedPx, boundaryRGBA) || sameRGBA(seedPx, fillRGBA)) return { img, q: [] };
+  if (isBoundary(seedPx) || sameRGBA(seedPx, fillRGBA)) return { img, q: [] };
 
   const q = [];
   const stack = [seed];
@@ -741,7 +748,7 @@ function buildBoundaryFillQueue(seed, boundaryHex, fillHex) {
 
     const c = getPixelRGBA(img, p.x, p.y);
     if (!c) continue;
-    if (sameRGBA(c, boundaryRGBA) || sameRGBA(c, fillRGBA)) continue;
+    if (isBoundary(c) || sameRGBA(c, fillRGBA)) continue;
 
     q.push({ x: p.x, y: p.y, rgba: fillRGBA });
 
@@ -763,7 +770,7 @@ function buildFloodFillQueue(seed, targetHex, fillHex) {
   const seedPx = getPixelRGBA(img, seed.x, seed.y);
   if (!seedPx) return { img, q: [] };
   // Flood fill replaces only target color
-  if (!sameRGBA(seedPx, targetRGBA) || sameRGBA(seedPx, fillRGBA)) return { img, q: [] };
+  if (!sameRGBA(seedPx, targetRGBA) && sameRGBA(seedPx, fillRGBA)) return { img, q: [] };
 
   const q = [];
   const stack = [seed];
